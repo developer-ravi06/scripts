@@ -1,0 +1,25 @@
+Connect-VIServer -server abc.domain.com -user uid -password pwd
+
+$vmlist = Get-Content C:\Users\userid\Desktop\Servers.txt
+
+foreach($VM in $VMlist) {New-Snapshot -VM $vm -Name Snapshot_Name -description (get-date),'snapshot description'}
+
+Disconnect-VIServer -Confirm:$false 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Syntax
+
+New-Snapshot [-VM] <VirtualMachine> [-Name] <String> [-Description <String>] [-Memory] [-Quiesce] [-Server <VIServer[]>] [-RunAsync] [-WhatIf] [-Confirm] [<CommonParameters>]
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Optional functions-
+
+VM	- Specifies the virtual machines you want to snapshot.
+Name	- Specifies a name for the new snapshot.
+Confirm	-	If the value is $true, indicates that the cmdlet asks for confirmation before running. If the value is $false, the cmdlet runs without asking for user confirmation.
+Description -	Provide a description of the new snapshot.
+Memory	-	If the value is $true and if the virtual machine is powered on, the virtual machine's memory state is preserved with the snapshot.
+Quiesce	-	If the value is $true and the virtual machine is powered on, VMware Tools are used to quiesce the file system of the virtual machine. This assures that a disk snapshot represents a consistent state of the guest file systems. If the virutal machine is powered off or VMware Tools are not available, the Quiesce parameter is ignored.	
+RunAsync	-	Indicates that the command returns immediately without waiting for the task to complete. In this mode, the output of the cmdlet is a Task object. For more information about the RunAsync parameter run "help About_RunAsync" in the VMware PowerCLI console.
+Server	VIServer[]- Specifies the vCenter Server systems on which you want to run the cmdlet. If no value is passed to this parameter, the command runs on the default servers. For more information about default servers, see the description of Connect-VIServer.	
+WhatIf	-	Indicates that the cmdlet is run only to display the changes that would be made and actually no objects are modified.
