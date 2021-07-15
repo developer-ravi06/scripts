@@ -1,0 +1,21 @@
+This cmdlet modifies the specified virtual machine snapshot.
+Syntax
+
+Set-Snapshot [-Snapshot] <Snapshot[]> [-Name <String>] [-Description <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Optional functions -
+
+Snapshot	-	Specifies the snapshot whose properties you want to change.	
+Confirm	-	If the value is $true, indicates that the cmdlet asks for confirmation before running. If the value is $false, the cmdlet runs without asking for user confirmation.	
+Description	-	Provides a new description for the snapshot.	
+Name	-	Specifies a new name for the snapshot.	
+WhatIf	-	Indicates that the cmdlet is run only to display the changes that would be made and actually no objects are modified.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Example -
+
+1. Set-Snapshot -Snapshot $snapshot -Name BeforePatch -Description "Before windows update"
+Sets the name and the description of the snapshot in the $snapshot variable.
+
+2. Get-VM | Get-Snapshot -Name "InitialState" | Set-Snapshot -Description "This snapshot is created right after the OS installation."
+Updates the description of all snapshots with name InitialState, from all virtual machines.
