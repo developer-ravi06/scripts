@@ -1,0 +1,19 @@
+This cmdlet removes the specified virtual machine snapshots.
+
+Syntax
+
+Remove-Snapshot [-Snapshot] <Snapshot[]> [-RemoveChildren] [-RunAsync] [-WhatIf] [-Confirm] [<CommonParameters>]
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Optional functions-
+
+Snapshot -	Specifies the snapshots you want to remove.	true	true (ByValue)
+Confirm	-	If the value is $true, indicates that the cmdlet asks for confirmation before running. If the value is $false, the cmdlet runs without asking for user confirmation.	false	false
+RemoveChildren	-	Indicates that you want to remove the children of the specified snapshots as well.	false	false
+RunAsync	-	Indicates that the command returns immediately without waiting for the task to complete. In this mode, the output of the cmdlet is a Task object. For more information about the RunAsync parameter run "help About_RunAsync" in the VMware PowerCLI console.	false	false
+WhatIf	-	Indicates that the cmdlet is run only to display the changes that would be made and actually no objects are modified.
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Example -
+Remove-Snapshot -Snapshot $snapshot1 -RemoveChildren
+Removes the snapshot in the $snapshot variable and its children.
