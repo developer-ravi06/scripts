@@ -1,0 +1,19 @@
+This cmdlet retrieves the virtual machine snapshots available on a vCenter Server system.
+
+Syntax
+
+Get-Snapshot [[-Name] <String[]>] [-Id <String[]>] [-VM] <VirtualMachine[]> [-Server <VIServer[]>] [<CommonParameters>]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Optional functions-
+
+VM	-	Specifies the virtual machines whose snapshots you want to retrieve. The position of this parameter is deprecated and will be changed in a future release. To avoid errors when you run existing scripts on future PowerCLI versions, specify the parameter by name.
+Name	-	Specifies the names of the snapshots you want to retrieve.	
+Id	-	Specifies the IDs of the snapshots you want to retrieve.
+Note: When a list of values is specified for the Id parameter, the returned objects would have an ID that matches exactly one of the string values in that list.
+Server	-	Specifies the vCenter Server systems on which you want to run the cmdlet. If no value is passed to this parameter, the command runs on the default servers. For more information about default servers, see the description of Connect-VIServer.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Example -
+
+Get-Snapshot -VM VM -Name 'Before ServicePack 2'
