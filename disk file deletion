@@ -1,0 +1,11 @@
+[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") 
+[void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") 
+$FileBrowser = New-Object System.Windows.Forms.OpenFileDialog -Property @{ 
+    InitialDirectory = [Environment]::GetFolderPath('Desktop') 
+}
+
+$null = $FileBrowser.ShowDialog()
+
+$file = $FileBrowser.FileName
+$vm = Get-Content $file
+foreach($vms in $vm) {Invoke-Command -ComputerName $vms -ScriptBlock {Remove-Item -Path File_Path -Recurse -Force}}
