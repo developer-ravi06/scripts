@@ -1,4 +1,7 @@
-﻿$cred = Get-Credential
+#Script to automate deployment of multiple vms fromtemplate using powercli on vcenter, cvs excel should be use for vm details
+ 
+ 
+ $cred = Get-Credential
 Connect-VIServer hlbavctrp101.corp.standard.com -Credential $cred
 
 #Excel with VM deatils
