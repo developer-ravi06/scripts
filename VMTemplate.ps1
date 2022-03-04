@@ -17,3 +17,11 @@ foreach ($vm in $vms){
 }
 
 Disconnect-VIServer hlbavctrp101.corp.standard.com -Confirm:$false
+
+
+
+#Use CSV file with below format to provide details in script for deployment
+
+
+#Name	Datastore	Folder	Network	vmHost	CPU	Core	Memory	HDD
+#test           testdatastore  testFol     VMNet     host1.com  4     4                4            100
