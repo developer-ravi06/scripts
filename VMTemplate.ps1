@@ -2,12 +2,12 @@
  
  
  $cred = Get-Credential
-Connect-VIServer hlbavctrp101.corp.standard.com -Credential $cred
+Connect-VIServer vcenter.domain.com -Credential $cred
 
 #Excel with VM deatils
-$vms = Import-Csv -Path C:\Users\s007097_su\Desktop\test.csv
+$vms = Import-Csv -Path C:\Users\ravi\Desktop\test.csv
 
-$template = Get-Template -Name "SCCM_Win10_21H2.5"
+$template = Get-Template -Name "vmTemplate"
 
 foreach ($vm in $vms){
     Write-Warning "Creating $($vm.Name) in $($vm.Cluster)"
@@ -16,7 +16,7 @@ foreach ($vm in $vms){
     Get-VM -Name $vm.Name | Get-HardDisk | Set-HardDisk -CapacityGB $vm.HDD -Confirm:$false
 }
 
-Disconnect-VIServer hlbavctrp101.corp.standard.com -Confirm:$false
+Disconnect-VIServer vcenter.domain.com -Confirm:$false
 
 
 
