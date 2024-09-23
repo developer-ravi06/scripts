@@ -1,0 +1,110 @@
+#Bash Shell script to fetch all VMs details from KVM hosted virtualization in a CSV.
+- All host password should be same while running script.
+- Mention all host IPs with sapce while ruunning script.
+
+
+***********************************************************************************************************************************
+
+#!/bin/bash
+
+# Check if the required arguments are provided
+if [ "$#" -lt 2 ]; then
+    echo "Usage: $0 <username> <kvm_host_ip1> [<kvm_host_ip2> ... <kvm_host_ipN>]"
+    echo "If 'all' is specified, it will fetch detailed info for all VMs on the specified hosts."
+    exit 1
+fi
+
+USERNAME="$1"
+shift
+KVM_HOST_IPS=()  # Array for KVM host IPs
+
+# Collect all KVM host IPs and determine if 'all' is specified
+while [ "$#" -gt 0 ]; do
+    if [[ "$1" == "all" ]]; then
+        FETCH_ALL="all"
+        break
+    fi
+    KVM_HOST_IPS+=("$1")
+    shift
+done
+
+OUTPUT_FILE="vm_details.csv"
+
+# Prompt for password securely
+read -sp "Enter password for $USERNAME: " PASSWORD
+echo
+
+# Function to fetch VM details from a single host
+fetch_vm_details() {
+    local KVM_HOST_IP="$1"
+    VM_IDS=$(sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$KVM_HOST_IP" "virsh list --all --name")
+    
+    # Write header to the CSV file
+    {
+        echo "Host IP,Name,ID,UUID,OS Type,State,CPU(s),Used Memory (GB),MAC Addresses"
+    } >> "$OUTPUT_FILE"
+
+    # Print header to console
+    printf "\nFetching details from host: $KVM_HOST_IP\n"
+    printf "%-20s | %-10s | %-10s | %-36s | %-10s | %-10s | %-10s | %-12s | %-50s\n" "Host IP" "Name" "ID" "UUID" "OS Type" "State" "CPU(s)" "Used Memory (GB)" "MAC Addresses"
+    echo "-------------------------------------------------------------------------------------------------------------------------------"
+    
+    for VM in $VM_IDS; do
+        # Get VM details
+        VM_INFO=$(sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$KVM_HOST_IP" "virsh dominfo \"$VM\"")
+        
+        # Extract relevant details
+        VM_NAME=$(echo "$VM_INFO" | grep "Name:" | awk '{print $2}')
+        VM_ID=$(echo "$VM_INFO" | grep "Id:" | awk '{print $2}')
+        VM_UUID=$(echo "$VM_INFO" | grep "UUID:" | awk '{print $2}')
+        VM_OS_TYPE=$(echo "$VM_INFO" | grep "OS:" | awk '{print $3}')
+        VM_STATE=$(echo "$VM_INFO" | grep "State:" | awk '{print $2}')
+        VM_CPU=$(echo "$VM_INFO" | grep "CPU(s):" | awk '{print $2}')
+        
+        # Initialize memory variable
+        VM_USED_MEM=""
+
+        # Get memory details only if the VM is running
+        if [[ "$VM_STATE" == "running" ]]; then
+            VM_USED_MEM=$(sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$KVM_HOST_IP" "virsh dommemstat \"$VM\" | grep 'actual' | awk '{print \$2/1024/1024}'")
+        else
+            VM_USED_MEM="N/A"
+        fi
+        
+        # Get MAC addresses using virsh dumpxml
+        MAC_INFO=$(sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$KVM_HOST_IP" "virsh dumpxml \"$VM\"")
+
+        # Initialize array to store MAC addresses
+        MACS=()
+        
+        # Extract MAC addresses
+        while IFS= read -r line; do
+            if [[ $line == *"<interface "* ]]; then
+                # Get the MAC address from the interface
+                MAC=$(echo "$MAC_INFO" | grep -A 1 "<interface" | grep "mac address=" | awk -F "'" '{print $2}')
+                MACS+=("$MAC")
+            fi
+        done <<< "$(echo "$MAC_INFO")"
+
+        # Join MACs into a comma-separated string
+        MAC_LIST=$(IFS=,; echo "${MACS[*]}")
+
+        # Append details to the CSV file
+        echo "$KVM_HOST_IP,$VM_NAME,$VM_ID,$VM_UUID,$VM_OS_TYPE,$VM_STATE,$VM_CPU,$VM_USED_MEM,$MAC_LIST" >> "$OUTPUT_FILE"
+
+        # Print formatted details to console
+        printf "%-20s | %-10s | %-10s | %-36s | %-10s | %-10s | %-10s | %-12s | %-50s\n" "$KVM_HOST_IP" "$VM_NAME" "$VM_ID" "$VM_UUID" "$VM_OS_TYPE" "$VM_STATE" "$VM_CPU" "$VM_USED_MEM" "$MAC_LIST"
+    done
+}
+
+# Write header to the CSV file
+echo "Host IP,Name,ID,UUID,OS Type,State,CPU(s),Used Memory (GB),MAC Addresses" > "$OUTPUT_FILE"
+
+# Loop through each host IP and fetch VM details
+for KVM_HOST_IP in "${KVM_HOST_IPS[@]}"; do
+    fetch_vm_details "$KVM_HOST_IP"
+done
+
+# Print the path of the exported file
+echo "VM details exported to: $(realpath $OUTPUT_FILE)"
+
