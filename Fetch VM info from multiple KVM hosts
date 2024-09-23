@@ -1,8 +1,9 @@
 #Bash Shell script to fetch all VMs details from KVM hosted virtualization in a CSV.
 - All host password should be same while running script.
 - Mention all host IPs with sapce while ruunning script.
-
-
+- Copy script and save in a file and name it like "check_vms.sh"
+- Run - chmod +x check_vms.sh
+- Run script like - ./check_vms.sh user 192.168.1.100 192.168.1.101 
 ***********************************************************************************************************************************
 
 #!/bin/bash
